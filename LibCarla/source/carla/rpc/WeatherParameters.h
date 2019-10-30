@@ -36,6 +36,7 @@ namespace rpc {
     static WeatherParameters MidRainSunset;
     static WeatherParameters HardRainSunset;
     static WeatherParameters SoftRainSunset;
+    static WeatherParameters Snow;
 
     /// @}
 
@@ -47,13 +48,21 @@ namespace rpc {
         float in_precipitation_deposits,
         float in_wind_intensity,
         float in_sun_azimuth_angle,
-        float in_sun_altitude_angle)
+        float in_sun_altitude_angle,
+        float in_exponential_fog_intensity,
+        float in_volumetric_fog_intensity,
+        float in_dirtiness,
+        float in_snow_intensity)
       : cloudyness(in_cloudyness),
         precipitation(in_precipitation),
         precipitation_deposits(in_precipitation_deposits),
         wind_intensity(in_wind_intensity),
         sun_azimuth_angle(in_sun_azimuth_angle),
-        sun_altitude_angle(in_sun_altitude_angle) {}
+        sun_altitude_angle(in_sun_altitude_angle),
+        exponential_fog_intensity(in_exponential_fog_intensity),
+        volumetric_fog_intensity(in_volumetric_fog_intensity),
+        dirtiness(in_dirtiness),
+        snow_intensity(in_snow_intensity) {}
 
     float cloudyness = 0.0f;
     float precipitation = 0.0f;
@@ -61,6 +70,10 @@ namespace rpc {
     float wind_intensity = 0.0f;
     float sun_azimuth_angle = 0.0f;
     float sun_altitude_angle = 0.0f;
+    float exponential_fog_intensity = 0.0f;
+    float volumetric_fog_intensity = 0.0f;
+    float dirtiness = 0.0f;
+    float snow_intensity = 0.0f;
 
 #ifdef LIBCARLA_INCLUDED_FROM_UE4
 
@@ -70,7 +83,11 @@ namespace rpc {
         precipitation_deposits(Weather.PrecipitationDeposits),
         wind_intensity(Weather.WindIntensity),
         sun_azimuth_angle(Weather.SunAzimuthAngle),
-        sun_altitude_angle(Weather.SunAltitudeAngle) {}
+        sun_altitude_angle(Weather.SunAltitudeAngle),
+        exponential_fog_intensity(Weather.ExponentialFogIntensity),
+        volumetric_fog_intensity(Weather.VolumetricFogIntensity),
+        dirtiness(Weather.Dirtiness),
+        snow_intensity(Weather.SnowIntensity) {}
 
     operator FWeatherParameters() const {
       FWeatherParameters Weather;
@@ -80,6 +97,10 @@ namespace rpc {
       Weather.WindIntensity = wind_intensity;
       Weather.SunAzimuthAngle = sun_azimuth_angle;
       Weather.SunAltitudeAngle = sun_altitude_angle;
+      Weather.ExponentialFogIntensity = exponential_fog_intensity;
+      Weather.VolumetricFogIntensity = volumetric_fog_intensity;
+      Weather.Dirtiness = dirtiness;
+      Weather.SnowIntensity = snow_intensity;
       return Weather;
     }
 
@@ -92,7 +113,11 @@ namespace rpc {
           precipitation_deposits != rhs.precipitation_deposits ||
           wind_intensity != rhs.wind_intensity ||
           sun_azimuth_angle != rhs.sun_azimuth_angle ||
-          sun_altitude_angle != rhs.sun_altitude_angle;
+          sun_altitude_angle != rhs.sun_altitude_angle ||
+          exponential_fog_intensity != rhs.exponential_fog_intensity ||
+          volumetric_fog_intensity != rhs.volumetric_fog_intensity ||
+          dirtiness != rhs.dirtiness ||
+          snow_intensity != rhs.snow_intensity;
     }
 
     bool operator==(const WeatherParameters &rhs) const {
@@ -105,7 +130,11 @@ namespace rpc {
         precipitation_deposits,
         wind_intensity,
         sun_azimuth_angle,
-        sun_altitude_angle);
+        sun_altitude_angle,
+        exponential_fog_intensity,
+        volumetric_fog_intensity,
+        dirtiness,
+        snow_intensity);
   };
 
 } // namespace rpc

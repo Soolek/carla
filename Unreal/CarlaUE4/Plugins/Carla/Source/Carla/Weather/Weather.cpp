@@ -26,6 +26,11 @@ void AWeather::ApplyWeather(const FWeatherParameters &InWeather)
   UE_LOG(LogCarla, Log, TEXT("  - WindIntensity = %.2f"), Weather.WindIntensity);
   UE_LOG(LogCarla, Log, TEXT("  - SunAzimuthAngle = %.2f"), Weather.SunAzimuthAngle);
   UE_LOG(LogCarla, Log, TEXT("  - SunAltitudeAngle = %.2f"), Weather.SunAltitudeAngle);
+  UE_LOG(LogCarla, Log, TEXT("  - ExponentialFogIntensity = %.2f"), Weather.ExponentialFogIntensity);
+  UE_LOG(LogCarla, Log, TEXT("  - VolumetricFogIntensity = %.2f"), Weather.VolumetricFogIntensity);
+  UE_LOG(LogCarla, Log, TEXT("  - Dirtiness = %.2f"), Weather.Dirtiness);
+  UE_LOG(LogCarla, Log, TEXT("  - SnowIntensity = %.2f"), Weather.SnowIntensity);
+
 #endif // CARLA_WEATHER_EXTRA_LOG
 
   // Call the blueprint that actually changes the weather.

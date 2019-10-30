@@ -17,7 +17,11 @@ namespace rpc {
         << ", precipitation_deposits=" << std::to_string(weather.precipitation_deposits)
         << ", wind_intensity=" << std::to_string(weather.wind_intensity)
         << ", sun_azimuth_angle=" << std::to_string(weather.sun_azimuth_angle)
-        << ", sun_altitude_angle=" << std::to_string(weather.sun_altitude_angle) << ')';
+        << ", sun_altitude_angle=" << std::to_string(weather.sun_altitude_angle)
+        << ", exponential_fog_intensity=" << std::to_string(weather.exponential_fog_intensity)
+        << ", volumetric_fog_intensity=" << std::to_string(weather.volumetric_fog_intensity)
+        << ", dirtiness=" << std::to_string(weather.dirtiness)
+        << ", snow_intensity=" << std::to_string(weather.snow_intensity) << ')';
     return out;
   }
 
@@ -29,19 +33,27 @@ void export_weather() {
   namespace cr = carla::rpc;
 
   auto cls = class_<cr::WeatherParameters>("WeatherParameters")
-    .def(init<float, float, float, float, float, float>(
+    .def(init<float, float, float, float, float, float, float, float, float, float>(
         (arg("cloudyness")=0.0f,
          arg("precipitation")=0.0f,
          arg("precipitation_deposits")=0.0f,
          arg("wind_intensity")=0.0f,
          arg("sun_azimuth_angle")=0.0f,
-         arg("sun_altitude_angle")=0.0f)))
+         arg("sun_altitude_angle")=0.0f,
+         arg("exponential_fog_intensity")=0.0f,
+         arg("volumetric_fog_intensity")=0.0f,
+         arg("dirtiness")=0.0f,
+         arg("snow_intensity")=0.0f)))
     .def_readwrite("cloudyness", &cr::WeatherParameters::cloudyness)
     .def_readwrite("precipitation", &cr::WeatherParameters::precipitation)
     .def_readwrite("precipitation_deposits", &cr::WeatherParameters::precipitation_deposits)
     .def_readwrite("wind_intensity", &cr::WeatherParameters::wind_intensity)
     .def_readwrite("sun_azimuth_angle", &cr::WeatherParameters::sun_azimuth_angle)
     .def_readwrite("sun_altitude_angle", &cr::WeatherParameters::sun_altitude_angle)
+    .def_readwrite("exponential_fog_intensity", &cr::WeatherParameters::exponential_fog_intensity)
+    .def_readwrite("volumetric_fog_intensity", &cr::WeatherParameters::volumetric_fog_intensity)
+    .def_readwrite("dirtiness", &cr::WeatherParameters::dirtiness)
+    .def_readwrite("snow_intensity", &cr::WeatherParameters::snow_intensity)
     .def("__eq__", &cr::WeatherParameters::operator==)
     .def("__ne__", &cr::WeatherParameters::operator!=)
     .def(self_ns::str(self_ns::self))
@@ -62,4 +74,5 @@ void export_weather() {
   cls.attr("MidRainSunset") = cr::WeatherParameters::MidRainSunset;
   cls.attr("HardRainSunset") = cr::WeatherParameters::HardRainSunset;
   cls.attr("SoftRainSunset") = cr::WeatherParameters::SoftRainSunset;
+  cls.attr("Snow") = cr::WeatherParameters::Snow;
 }

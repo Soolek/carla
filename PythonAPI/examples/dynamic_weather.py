@@ -35,6 +35,14 @@ def clamp(value, minimum=0.0, maximum=100.0):
     return max(minimum, min(value, maximum))
 
 
+def trapezoid_flow(value, min_val, max_val):
+    # returns height at position (value) of a isosceles trapezoid with
+    # bottom base width of (max-min) and upper base width of (max-min)/2
+    center = (max_val + min_val) / 2
+    spread = (max_val - min_val) / 2
+    return clamp(2 * (spread - abs(value - center)) / spread, 0, 1)
+
+
 class Sun(object):
     def __init__(self, azimuth, altitude):
         self.azimuth = azimuth
@@ -54,28 +62,32 @@ class Sun(object):
 
 class Storm(object):
     def __init__(self, precipitation):
-        self._t = precipitation if precipitation > 0.0 else -50.0
-        self._increasing = True
         self.clouds = 0.0
         self.rain = 0.0
         self.puddles = 0.0
         self.wind = 0.0
 
+        self.fog_exp = 0.0
+        self.fog_vol = 0.0
+        self.snow = 0.0
+
     def tick(self, delta_seconds):
-        delta = (1.3 if self._increasing else -1.3) * delta_seconds
-        self._t = clamp(delta + self._t, -250.0, 100.0)
-        self.clouds = clamp(self._t + 40.0, 0.0, 90.0)
-        self.rain = clamp(self._t, 0.0, 80.0)
-        delay = -10.0 if self._increasing else 90.0
-        self.puddles = clamp(self._t + delay, 0.0, 75.0)
-        self.wind = clamp(self._t - delay, 0.0, 80.0)
-        if self._t == -250.0:
-            self._increasing = True
-        if self._t == 100.0:
-            self._increasing = False
+        delta = delta_seconds % 200
+        self.clouds = trapezoid_flow(delta, 30.0, 90.0) + trapezoid_flow(delta, 130.0, 190.0)
+        self.rain = trapezoid_flow(delta, 40.0, 80.0)
+        self.puddles = trapezoid_flow(delta, 50.0, 100.0)
+        self.wind = trapezoid_flow(delta, 20.0, 60.0)
+
+        self.fog_exp = trapezoid_flow(delta, 120.0, 180.0)
+        self.fog_vol = trapezoid_flow(delta, 120.0, 180.0)
+        self.snow = trapezoid_flow(delta, 140.0, 190.0)
 
     def __str__(self):
-        return 'Storm(clouds=%d%%, rain=%d%%, wind=%d%%)' % (self.clouds, self.rain, self.wind)
+        ret = 'Storm(clouds=%d%%, rain=%d%%, puddles=%d%%, wind=%d%%, ' \
+              % (self.clouds, self.rain, self.puddles, self.wind)
+        ret += 'fog_exp=%d%%, fog_vol=%d%%, snow=%d%%)' \
+               % (self.fog_exp, self.fog_vol, self.snow)
+        return ret
 
 
 class Weather(object):
@@ -87,12 +99,18 @@ class Weather(object):
     def tick(self, delta_seconds):
         self._sun.tick(delta_seconds)
         self._storm.tick(delta_seconds)
-        self.weather.cloudyness = self._storm.clouds
-        self.weather.precipitation = self._storm.rain
-        self.weather.precipitation_deposits = self._storm.puddles
-        self.weather.wind_intensity = self._storm.wind
+
         self.weather.sun_azimuth_angle = self._sun.azimuth
         self.weather.sun_altitude_angle = self._sun.altitude
+
+        self.weather.cloudyness = clamp(self._storm.clouds * 90.0, 0.0, 90.0)
+        self.weather.precipitation = clamp(self._storm.rain * 80.0, 0.0, 80.0)
+        self.weather.precipitation_deposits = clamp(self._storm.puddles * 75.0, 0.0, 75.0)
+        self.weather.wind_intensity = clamp(self._storm.wind * 80.0, 0.0, 80.0)
+        self.weather.exponential_fog_intensity = clamp(self._storm.fog_exp, 0.0, 1.0)
+        self.weather.volumetric_fog_intensity = clamp(self._storm.fog_vol * 0.25, 0.0, 0.25)
+        self.weather.snow_intensity = clamp(self._storm.snow * 50.0, 0.0, 50.0)
+        self.weather.dirtiness = clamp(self._storm.snow * 10.0, 0.0, 10.0)
 
     def __str__(self):
         return '%s %s' % (self._sun, self._storm)
@@ -143,5 +161,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
