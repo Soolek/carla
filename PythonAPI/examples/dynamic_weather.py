@@ -71,23 +71,27 @@ class Storm(object):
         self.fog_vol = 0.0
         self.snow = 0.0
 
-    def tick(self, delta_seconds):
-        delta = delta_seconds % 200
-        self.clouds = trapezoid_flow(delta, 30.0, 90.0) + trapezoid_flow(delta, 130.0, 190.0)
-        self.rain = trapezoid_flow(delta, 40.0, 80.0)
-        self.puddles = trapezoid_flow(delta, 50.0, 100.0)
-        self.wind = trapezoid_flow(delta, 20.0, 60.0)
+        self.delta = 0
 
-        self.fog_exp = trapezoid_flow(delta, 120.0, 180.0)
-        self.fog_vol = trapezoid_flow(delta, 120.0, 180.0)
-        self.snow = trapezoid_flow(delta, 140.0, 190.0)
+    def tick(self, delta_seconds):
+        self.delta = (self.delta+delta_seconds) % 400
+        delta =self.delta
+
+        self.clouds = trapezoid_flow(delta, 60.0, 180.0) + trapezoid_flow(delta, 260.0, 380.0)
+        self.rain = trapezoid_flow(delta, 80.0, 160.0)
+        self.puddles = trapezoid_flow(delta, 100.0, 200.0)
+        self.wind = trapezoid_flow(delta, 40.0, 120.0)
+
+        self.fog_exp = trapezoid_flow(delta, 240.0, 360.0)
+        self.fog_vol = trapezoid_flow(delta, 240.0, 360.0)
+        self.snow = trapezoid_flow(delta, 280.0, 380.0)
 
     def __str__(self):
-        ret = 'Storm(clouds=%d%%, rain=%d%%, puddles=%d%%, wind=%d%%, ' \
-              % (self.clouds, self.rain, self.puddles, self.wind)
-        ret += 'fog_exp=%d%%, fog_vol=%d%%, snow=%d%%)' \
-               % (self.fog_exp, self.fog_vol, self.snow)
-        return ret
+        ret = 'Storm(c=%d%%, r=%d%%, p=%d%%, w=%d%%, ' \
+              % (self.clouds*100.0, self.rain*100.0, self.puddles*100.0, self.wind*100.0)
+        ret += 'f_e=%d%%, f_v=%d%%, s=%d%%)' \
+               % (self.fog_exp*100.0, self.fog_vol*100.0, self.snow*100.0)
+        return ret + '%f' % self.delta
 
 
 class Weather(object):
